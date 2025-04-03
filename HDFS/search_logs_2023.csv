@@ -1,0 +1,11 @@
+timestamp,user_id,query,location,clicked_hotel_id
+2023-07-01T08:15:23Z,1,"Paris","Paris","HOT-001"
+2023-07-01T08:17:45Z,1,"Paris","Paris","HOT-001"
+2023-07-15T14:30:45Z,2,"Chamonix","Chamonix","HOT-002"
+2023-07-15T14:32:18Z,2,"Chamonix","Chamonix","HOT-002"
+2023-08-20T10:05:33Z,3,"Nice","Nice","HOT-003"
+2023-08-20T10:07:45Z,3,"Nice","Nice","HOT-003"
+2023-09-05T16:20:12Z,4,"Bordeaux","Bordeaux","HOT-004"
+2023-09-05T16:22:30Z,4,"Bordeaux","Bordeaux","HOT-004"
+2023-10-10T11:10:05Z,5,"Lyon","Lyon","HOT-005"
+2023-10-10T11:12:30Z,5,"Lyon","Lyon","HOT-005" 
