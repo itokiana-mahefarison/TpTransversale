@@ -70,19 +70,19 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 
 2. **Démarrer les services avec Docker Compose** :
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 3. **Vérifier que tous les services sont en cours d'exécution** :
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 ### Arrêt du Projet
 Pour arrêter les services, exécutez la commande suivante :
-    ```bash
-    docker-compose down
-    ```
+   ```bash
+   docker compose down
+   ```
 
 ## Structure du Projet
 - **docker-compose.yml** : Configuration des services Docker.
