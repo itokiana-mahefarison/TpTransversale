@@ -1,28 +1,49 @@
-version: '3.8'
-
 services:
   cassandra:
-    image: cassandra:latest
-    container_name: cassandra_db
+    image: cassandra:3.11
+    container_name: hotel_cassandra
+    restart: always
     ports:
       - "9042:9042"
     environment:
       - CASSANDRA_CLUSTER_NAME=tourism_cluster
     volumes:
-      - cassandra_data:/var/lib/cassandra
+      - cassandra:/var/lib/cassandra
 
   postgres:
-    image: postgres:latest
-    container_name: postgres_db
+    container_name: hotel_postgres
+    image: postgres:16.6
+    restart: always
+    shm_size: 128mb
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: tourism_db
+      POSTGRES_USER: hotel_admin
+      POSTGRES_PASSWORD: hotel@123
+      POSTGRES_DB: hotel_db
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
 
+  oraclenosql:
+    image: ghcr.io/oracle/nosql:latest-ce
+    container_name: hotel_oraclenosql
+    environment:
+      - KV_PROXY_PORT=8080
+      - HOSTNAME=oraclenosql
+    ports:
+      - "5436:8080"
+    restart: unless-stopped
+    volumes:
+      - oraclenosql:/kvroot
+
+  meltano:
+    container_name: hotel_meltano
+    image: meltano/meltano
+    entrypoint: sleep infinity
+    volumes:
+      - meltano:/project
 volumes:
-  cassandra_data:
-  postgres_data: 
+  postgres:
+  oraclenosql:
+  cassandra:
+  meltano:
