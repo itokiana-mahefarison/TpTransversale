@@ -45,6 +45,41 @@ services:
     entrypoint: sleep infinity
     volumes:
       - meltano:/project
+  
+  hadoop-namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: hotel_hadoop_namenode
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
+      - HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false
+    volumes:
+      - namenode:/hadoop/dfs/name
+    ports:
+      - "9870:9870"  
+      - "9000:9000" 
+    networks:
+      - default
+
+  hadoop-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: hotel_hadoop_datanode
+    environment:
+      - CLUSTER_NAME=test
+      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+      - HDFS_CONF_dfs_replication=1
+      - HDFS_CONF_dfs_namenode_datanode_registration_ip___hostname___check=false
+    volumes:
+      - datanode:/hadoop/dfs/data
+    depends_on:
+      - hadoop-namenode
+    ports:
+      - "9864:9864"
+    networks:
+      - default
+
 
   hivepostgres:
     container_name: hotel_hive_postgres
@@ -69,8 +104,11 @@ services:
         -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://hivepostgres:5432/metastore_db
         -Djavax.jdo.option.ConnectionUserName=hive
         -Djavax.jdo.option.ConnectionPassword=hive
+        -Dhive.metastore.warehouse.dir=hdfs://hadoop-namenode:9000/user/hive/warehouse
     depends_on:
       - hivepostgres
+      - hadoop-namenode
+      - hadoop-datanode
     ports:
       - "9083:9083"
     volumes:
@@ -85,10 +123,14 @@ services:
       - 10002:10002
     environment:
       SERVICE_NAME: hiveserver2
-      SERVICE_OPTS: -Dhive.metastore.uris=thrift://hivemetastore:9083
+      SERVICE_OPTS: 
+        -Dhive.metastore.uris=thrift://hivemetastore:9083
+        -Dhive.metastore.warehouse.dir=hdfs://hadoop-namenode:9000/user/hive/warehouse
       HIVE_AUX_JARS_PATH: /opt/hive/lib/ext_kv
     depends_on:
       - hivemetastore
+      - hadoop-namenode
+      - hadoop-datanode
     volumes:
       - warehouse:/opt/hive/data/warehouse
       - ./hive/connectors/oraclenosql:/opt/hive/lib/ext_kv
@@ -110,3 +152,5 @@ volumes:
   meltano:
   hive_postgres:
   warehouse:
+  namenode:
+  datanode:
