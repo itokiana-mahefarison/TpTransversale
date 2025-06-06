@@ -32,13 +32,16 @@ docker-compose up -d
 
 ### 3. Peupler les bases de données
 
-Pour Oracle NoSQL :
+Au lancement d'Oracle NoSQL, le conteneur va insérer 10 000 lignes dans la base.
+
+Attendre l'insertion des données dans Oracle NoSQ :
 
 ```bash
-./init-data-oracle-nosql.sh  # Sur Windows, renommez le fichier en .bat
+docker logs -f hotel_oraclenosql
 ```
 
-> Cela va créer les schémas dans Oracle NoSQL et insérer 10 000 lignes
+> Cette commande affiche les logs en temps réel.  
+> Attendez que le message FINISHED apparaisse pour confirmer la fin de l'import.
 
 ### 4. Hive
 

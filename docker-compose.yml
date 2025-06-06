@@ -30,6 +30,7 @@ services:
   oraclenosql:
     image: ghcr.io/oracle/nosql:latest-ce
     container_name: hotel_oraclenosql
+    working_dir: /app/kv-24.4.9
     environment:
       - KV_PROXY_PORT=8080
       - HOSTNAME=oraclenosql
@@ -38,6 +39,8 @@ services:
     restart: unless-stopped
     volumes:
       - oraclenosql:/kvroot
+      - ./docker/oraclenosql/init.sql:/app/kv-24.4.9/init.sql
+    command: bash -c "./start-kvlite.sh & sleep 20 && java -jar lib/sql.jar -helper-hosts localhost:5000 -store kvstore < init.sql && echo FINISHED && wait"
 
   meltano:
     container_name: hotel_meltano
@@ -86,12 +89,12 @@ services:
     environment:
       SERVICE_NAME: hiveserver2
       SERVICE_OPTS: -Dhive.metastore.uris=thrift://hivemetastore:9083
-      HIVE_AUX_JARS_PATH: /opt/hive/lib/ext_kv
+      HIVE_AUX_JARS_PATH: /opt/hive/lib/connectors
     depends_on:
       - hivemetastore
     volumes:
       - warehouse:/opt/hive/data/warehouse
-      - ./hive/connectors/oraclenosql:/opt/hive/lib/ext_kv
+      - ./hive/connectors:/opt/hive/lib/connectors
 
   jupyter:
     container_name: jupyter
