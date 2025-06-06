@@ -100,6 +100,44 @@ Rendez-vous sur l'interface Jupyter : [http://localhost:8888/](http://localhost:
 - **Exemple de schéma** : Voir `oracle_nosql_schema.sql` (lignes 1 à 66).
 
 ### 4. **HDFS**
+  # Lien sur navigateur pour voir l'etat du namenode et datanode
+  - http://localhost:9870/
+  
+  # Copier le fichier JSON local dans le conteneur du NameNode HDFS
+  ```bash
+  docker cp ./HDFS/weather_data_2023.json hotel_hadoop_namenode:/weather_data_2023.json
+  ```
+
+  # Verification des erreurs entre le datanode et le namenode
+  ```bash
+    docker logs hotel_hadoop_datanode
+    docker logs hotel_hadoop_namenode
+  ```
+
+  # Entrer dans le conteneur du NameNode
+  ```bash
+  docker exec -it hotel_hadoop_namenode bash
+  ```
+
+  # Créer un répertoire dans HDFS
+  ```bash
+  hadoop fs -mkdir -p /user/root
+  ```
+
+  # Déplacer le fichier dans HDFS
+  ```bash
+  hadoop fs -put /weather_data_2023.json /user/root/weather_data_2023.json
+  ```
+
+  # Vérifier que le fichier est bien présent
+  ```bash
+  hdfs dfs -ls /user/root
+  ```
+
+  # Afficher le contenu du fichier
+  ```bash
+  hdfs dfs -cat /user/root/weather_data_2023.json
+  ```
 
 - **Données stockées** :
   - Données météorologiques (date, localisation, température, précipitations, conditions météo)
