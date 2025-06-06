@@ -30,6 +30,13 @@ docker-compose up -d
 - `hiveserver2` : ports 10000 et 10002
 - `jupyter` : port 8888
 
+- | Composant   | Port interne | Port externe (host) | Description                 |
+  | ----------- | ------------ | ------------------- | --------------------------- |
+  | NameNode    | 9000         | 9000                | Communication RPC avec HDFS |
+  | NameNode UI | 9870         | 9870                | Interface Web de gestion    |
+  | DataNode    | 9864         | (non exposé)        | Interface Web du DataNode   |
+
+
 ### 3. Peupler les bases de données
 
 Au lancement d'Oracle NoSQL, le conteneur va insérer 10 000 lignes dans la base.
@@ -144,6 +151,96 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 3. **Vérifier que tous les services sont en cours d'exécution** :
    ```bash
    docker compose ps
+   ```
+
+4. **Copier le fichier local dans le conteneur NameNode** :
+
+   ```bash
+   hdfs dfs -mkdir -p /tmp
+    docker cp HDFS/weather_data_2023.json hotel_hadoop_namenode:/tmp/weather_data_2023.json
+    docker cp HDFS/hotel_search_logs.csv hotel_hadoop_namenode:/tmp/hotel_search_logs.csv
+    docker cp HDFS/activity_search_logs.csv hotel_hadoop_namenode:/tmp/activity_search_logs.csv
+    docker cp HDFS/search_logs_2023.csv hotel_hadoop_namenode:/tmp/search_logs_2023.csv
+
+   ```
+   
+5. **Verification des donnees dans HDFS** 
+
+   Connectez-vous au conteneur Hadoop et vérifiez les fichiers :
+
+   ```bash
+    docker exec -it hotel_hadoop_namenode bash
+    cat /tmp/activity_search_logs.csv
+    cat /tmp/weather_data_2023.json
+    cat /tmp/hotel_search_logs.csv
+    cat /tmp/search_logs_2023.csv
+   ```
+   
+6. ** Connecte-toi dans le conteneur NameNode ** :
+
+   ```bash
+   docker exec -it hotel_hadoop_namenode bash
+   ```
+
+   Ensuite, connectez-vous à HDFS :
+
+   ```bash
+   hdfs dfs -ls /tmp
+   ```
+7. **Copier les fichiers dans HDFS** :
+
+   ```bash
+    # Weather Data
+    hdfs dfs -mkdir -p /tmp/weather_data_2023
+    hdfs dfs -rm -f /tmp/weather_data_2023/weather_data_2023.json
+    hdfs dfs -put /tmp/weather_data_2023.json /tmp/weather_data_2023/
+    
+    # Hotel Search Logs
+    hdfs dfs -mkdir -p /tmp/hotel_search_logs
+    hdfs dfs -rm -f /tmp/hotel_search_logs/hotel_search_logs.csv
+    hdfs dfs -put /tmp/hotel_search_logs.csv /tmp/hotel_search_logs/
+    
+    # Activity Search Logs
+    hdfs dfs -mkdir -p /tmp/activity_search_logs
+    hdfs dfs -rm -f /tmp/activity_search_logs/activity_search_logs.csv
+    hdfs dfs -put /tmp/activity_search_logs.csv /tmp/activity_search_logs/
+    
+    # Search Logs 2023
+    hdfs dfs -mkdir -p /tmp/search_logs_2023
+    hdfs dfs -rm -f /tmp/search_logs_2023/search_logs_2023.csv
+    hdfs dfs -put /tmp/search_logs_2023.csv /tmp/search_logs_2023/
+
+
+   ```
+
+8. **Vérification des fichiers dans HDFS** :
+
+   ```bash
+    hdfs dfs -ls /tmp/weather_data_2023
+    hdfs dfs -ls /tmp/hotel_search_logs
+    hdfs dfs -ls /tmp/activity_search_logs
+    hdfs dfs -ls /tmp/search_logs_2023
+
+   ```
+   
+6. **Sortir du namenode** :
+    ```bash
+      exit;
+   ```
+7. **Creation des table externes dans hive pour toutes les fichiers** :
+
+   ```bash
+   docker exec -it hotel_hiveserver2 /bin/bash
+   beeline -u jdbc:hive2://localhost:10000
+   ```
+
+   ```
+8** Connection à hive** :
+
+   ```bash
+    docker exec -it hotel_hiveserver2 /bin/bash
+    hdfs dfs -ls /tmp/ 
+    beeline -u jdbc:hive2://localhost:10000
    ```
 
 ### Arrêt du Projet

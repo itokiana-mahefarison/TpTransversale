@@ -1,4 +1,4 @@
-timestamp,session_id,client_id,ip_address,user_agent,search_query,filters,results_count,page_number,action
+date_log,session_id,client_id,ip_address,user_agent,search_query,filters,results_count,page_number,action
 2023-07-01T08:15:23Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","Paris","{""dates"":""2023-07-10 to 2023-07-15"",""guests"":2,""rooms"":1,""stars"":5}",12,1,view_results
 2023-07-01T08:17:45Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","Paris","{""dates"":""2023-07-10 to 2023-07-15"",""guests"":2,""rooms"":1,""stars"":5,""price_max"":400}",8,1,filter_results
 2023-07-01T08:19:12Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","Paris","{""dates"":""2023-07-10 to 2023-07-15"",""guests"":2,""rooms"":1,""stars"":5,""price_max"":400}",8,1,view_hotel_details

@@ -1,4 +1,4 @@
-timestamp,session_id,client_id,ip_address,user_agent,search_query,filters,results_count,page_number,action
+date_log,session_id,client_id,ip_address,user_agent,search_query,filters,results_count,page_number,action
 2023-07-02T09:30:15Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","activités Paris","{""date"":""2023-07-12"",""categorie"":""Culture""}",25,1,view_results
 2023-07-02T09:32:40Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","activités Paris","{""date"":""2023-07-12"",""categorie"":""Culture"",""prix_max"":30}",18,1,filter_results
 2023-07-02T09:35:10Z,SES-2023-001,1,192.168.1.101,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36","activités Paris","{""date"":""2023-07-12"",""categorie"":""Culture"",""prix_max"":30}",18,1,view_activity_details
