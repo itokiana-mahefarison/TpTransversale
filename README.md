@@ -117,7 +117,7 @@ Rendez-vous sur l'interface Jupyter : [http://localhost:8888/](http://localhost:
   - Les données sont stockées sous forme de fichiers JSON et CSV dans HDFS.
   - Les fichiers sont accessibles via des outils comme Apache Spark ou Hive pour des analyses croisées.
 - **Exemple de données** :
-  - `HDFS/weather_data_2023.json` (lignes 1 à 37)
+  - `HDFS/weather_data_2023.csv` (lignes 1 à 37)
   - `HDFS/hotel_search_logs.csv` (lignes 1 à 20)
   - `HDFS/activity_search_logs.csv` (lignes 1 à 20)
   - `HDFS/search_logs_2023.csv` (lignes 1 à 10)
@@ -156,9 +156,7 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 4. **Copier le fichier local dans le conteneur NameNode** :
 
    ```bash
-   docker exec -it hotel_hadoop_namenode bash 
-   hdfs dfs -mkdir -p /tmp
-    docker cp HDFS/weather_data_2023.json hotel_hadoop_namenode:/tmp/weather_data_2023.json
+    docker cp HDFS/weather_data.csv hotel_hadoop_namenode:/tmp/weather_data.csv
     docker cp HDFS/hotel_search_logs.csv hotel_hadoop_namenode:/tmp/hotel_search_logs.csv
     docker cp HDFS/activity_search_logs.csv hotel_hadoop_namenode:/tmp/activity_search_logs.csv
     docker cp HDFS/search_logs_2023.csv hotel_hadoop_namenode:/tmp/search_logs_2023.csv
@@ -168,11 +166,13 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 5. **Verification des donnees dans HDFS** 
 
    Connectez-vous au conteneur Hadoop et vérifiez les fichiers :
-
-   ```bash
+ ```bash
     docker exec -it hotel_hadoop_namenode bash
+
+   ```
+   ```bash
     cat /tmp/activity_search_logs.csv
-    cat /tmp/weather_data_2023.json
+    cat /tmp/weather_data.csv
     cat /tmp/hotel_search_logs.csv
     cat /tmp/search_logs_2023.csv
    ```
@@ -191,28 +191,9 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 7. **Copier les fichiers dans HDFS** :
 
    ```bash
-    # Weather Data
-    hdfs dfs -mkdir -p /tmp/weather_data_2023
-    hdfs dfs -rm -f /tmp/weather_data_2023/weather_data_2023.json
-    hdfs dfs -put /tmp/weather_data_2023.json /tmp/weather_data_2023/
-    
-    # Hotel Search Logs
-    hdfs dfs -mkdir -p /tmp/hotel_search_logs
-    hdfs dfs -rm -f /tmp/hotel_search_logs/hotel_search_logs.csv
-    hdfs dfs -put /tmp/hotel_search_logs.csv /tmp/hotel_search_logs/
-    
-    # Activity Search Logs
-    hdfs dfs -mkdir -p /tmp/activity_search_logs
-    hdfs dfs -rm -f /tmp/activity_search_logs/activity_search_logs.csv
-    hdfs dfs -put /tmp/activity_search_logs.csv /tmp/activity_search_logs/
-    
-    # Search Logs 2023
-    hdfs dfs -mkdir -p /tmp/search_logs_2023
-    hdfs dfs -rm -f /tmp/search_logs_2023/search_logs_2023.csv
-    hdfs dfs -put /tmp/search_logs_2023.csv /tmp/search_logs_2023/
+    docker exec -it hotel_hadoop_namenode bash
+    ```
 
-
-   ```
 
 8. **Vérification des fichiers dans HDFS** :
 
@@ -222,27 +203,72 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
     hdfs dfs -ls /tmp/activity_search_logs
     hdfs dfs -ls /tmp/search_logs_2023
 
-   ```
-   
+
+
 6. **Sortir du namenode** :
     ```bash
       exit;
    ```
-7. **Creation des table externes dans hive pour toutes les fichiers** :
+7. **Copie des csv dans hdfs
+    ```bash
+      docker exec -it hotel_hadoop_namenode bash
+    ```
+    **Weather data**
+    ```bash
+        hdfs dfs -mkdir -p /hotel/weather_data
+        hdfs dfs -rm -f /hotel/weather_data/weather_data.csv
+        hdfs dfs -put /tmp/weather_data.csv /hotel/weather_data/
+      ```
+    **Hotel search logs**
+    ```bash
+        hdfs dfs -mkdir -p /hotel/hotel_search_logs
+        hdfs dfs -rm -f /hotel/hotel_search_logs/hotel_search_logs.csv
+        hdfs dfs -put /tmp/hotel_search_logs.csv /hotel/hotel_search_logs/
+      ```
+      **Activity Search logs**
+      ```bash
+        hdfs dfs -mkdir -p /hotel/activity_search_logs
+        hdfs dfs -rm -f /hotel/activity_search_logs/activity_search_logs.csv
+        hdfs dfs -put /tmp/activity_search_logs.csv /hotel/activity_search_logs/
+      ```
+      **Search Logs 2023**
+      ```bash
+        hdfs dfs -mkdir -p /hotel/search_logs_2023
+        hdfs dfs -rm -f /hotel/search_logs_2023/search_logs_2023.csv
+        hdfs dfs -put /tmp/search_logs_2023.csv /hotel/search_logs_2023/
+      ```
+
+8. **Creation des table externes dans hive pour toutes les fichiers** :
 
    ```bash
    docker exec -it hotel_hiveserver2 /bin/bash
    beeline -u jdbc:hive2://localhost:10000
    ```
 
-   ```
-8** Connection à hive** :
+
+#
+
+
+# 
+
+
+# 
+
+
+8. ** Connection à hive** :
 
    ```bash
     docker exec -it hotel_hiveserver2 /bin/bash
     hdfs dfs -ls /tmp/ 
     beeline -u jdbc:hive2://localhost:10000
    ```
+
+
+
+
+
+
+
 
 ### Arrêt du Projet
 
