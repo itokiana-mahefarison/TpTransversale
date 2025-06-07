@@ -156,6 +156,7 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 4. **Copier le fichier local dans le conteneur NameNode** :
 
    ```bash
+   docker exec -it hotel_hadoop_namenode bash 
    hdfs dfs -mkdir -p /tmp
     docker cp HDFS/weather_data_2023.json hotel_hadoop_namenode:/tmp/weather_data_2023.json
     docker cp HDFS/hotel_search_logs.csv hotel_hadoop_namenode:/tmp/hotel_search_logs.csv
