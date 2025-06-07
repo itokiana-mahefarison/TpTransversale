@@ -4,6 +4,7 @@ services:
   cassandra:
     image: cassandra:3.11
     container_name: hotel_cassandra
+    working_dir: /app/cassandra
     restart: always
     ports:
       - "9042:9042"
@@ -11,6 +12,20 @@ services:
       - CASSANDRA_CLUSTER_NAME=tourism_cluster
     volumes:
       - cassandra:/var/lib/cassandra
+      - ./docker/cassandra/cassandra_schema.cql:/app/cassandra/cassandra_schema.cql
+    networks:
+      - hotel_net
+
+  init-cql:
+    image: cassandra:3.11
+    container_name: hotel_cassandra_init
+    working_dir: /app/cassandra
+    command: bash -c "sleep 45 && cqlsh -u cassandra -p cassandra cassandra 9042 -f /app/cassandra/cassandra_schema.cql && echo 'cassandra_schema.cql executed'"
+    volumes:
+      - ./docker/cassandra/cassandra_schema.cql:/app/cassandra/cassandra_schema.cql
+    depends_on:
+      - cassandra
+    restart: no
     networks:
       - hotel_net
 
@@ -56,6 +71,10 @@ services:
     entrypoint: sleep infinity
     volumes:
       - meltano:/project
+      - ./docker/meltano/meltano.yml:/project/meltano.yml
+      - ./docker/meltano/dbt_project.yml:/project/dbt_project.yml
+      - ./docker/meltano/profiles.yml:/project/profiles.yml
+      - ./docker/meltano/models:/project/models
     networks:
       - hotel_net
 
@@ -124,35 +143,35 @@ services:
     networks:
       - hotel_net
 
-  hadoop-namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
-    container_name: hotel_hadoop_namenode
-    environment:
-      - CLUSTER_NAME=test-hadoop
-      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
-      - HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
-      - HDFS_CONF_dfs_permissions_enabled=false
-    ports:
-      - 9870:9870
-      - 9000:9000
-    volumes:
-      - hadoop_namenode:/hadoop/dfs/name
-    networks:
-      - hotel_net
+  # hadoop-namenode:
+  #   image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+  #   container_name: hotel_hadoop_namenode
+  #   environment:
+  #     - CLUSTER_NAME=test-hadoop
+  #     - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+  #     - HDFS_CONF_dfs_namenode_name_dir=file:///hadoop/dfs/name
+  #     - HDFS_CONF_dfs_permissions_enabled=false
+  #   ports:
+  #     - 9870:9870
+  #     - 9000:9000
+  #   volumes:
+  #     - hadoop_namenode:/hadoop/dfs/name
+  #   networks:
+  #     - hotel_net
 
-  hadoop-datanode:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
-    container_name: hotel_hadoop_datanode
-    environment:
-      - CLUSTER_NAME=test-hadoop
-      - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
-      - HDFS_CONF_dfs_permissions_enabled=false
-    depends_on:
-      - hadoop-namenode
-    volumes:
-      - hadoop_datanode:/hadoop/dfs/data
-    networks:
-      - hotel_net
+  # hadoop-datanode:
+  #   image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+  #   container_name: hotel_hadoop_datanode
+  #   environment:
+  #     - CLUSTER_NAME=test-hadoop
+  #     - CORE_CONF_fs_defaultFS=hdfs://hadoop-namenode:9000
+  #     - HDFS_CONF_dfs_permissions_enabled=false
+  #   depends_on:
+  #     - hadoop-namenode
+  #   volumes:
+  #     - hadoop_datanode:/hadoop/dfs/data
+  #   networks:
+  #     - hotel_net
 
 volumes:
   postgres:
