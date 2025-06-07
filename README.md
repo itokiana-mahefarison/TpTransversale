@@ -238,7 +238,27 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
         hdfs dfs -put /tmp/search_logs_2023.csv /hotel/search_logs_2023/
       ```
 
-8. **Creation des table externes dans hive pour toutes les fichiers** :
+8. ** Lancer un pipeline ELT avec Meltano
+
+  **Installation des plugins Meltano**
+
+    Dans le conteneur Meltano, exécute :
+
+    ```bash
+    docker exec -it hotel_meltano bash
+    cd /project
+    meltano install
+    ```
+
+
+  **Exécution d'un pipeline ELT**
+
+    Pour lancer un pipeline ELT (exemple pour le job `elt-historique-reservations`) :
+
+    ```bash
+    meltano run elt-historique-reservations
+
+9. **Creation des table externes dans hive pour toutes les fichiers** :
 
    ```bash
    docker exec -it hotel_hiveserver2 /bin/bash
@@ -255,7 +275,7 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
 # 
 
 
-8. ** Connection à hive** :
+10. ** Connection à hive** :
 
    ```bash
     docker exec -it hotel_hiveserver2 /bin/bash

@@ -15,7 +15,6 @@ plugins:
         user: hotel_admin
         password: hotel@123
         database: hotel_db
-      # À adapter après création des modèles dbt (vues ou tables matérialisées)
       select:
         - historique_reservations
         - reservations_par_hotel
