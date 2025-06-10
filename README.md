@@ -30,25 +30,15 @@ docker-compose up -d
 - `hiveserver2` : ports 10000 et 10002
 - `jupyter` : port 8888
 
-- | Composant   | Port interne | Port externe (host) | Description                 |
-  | ----------- | ------------ | ------------------- | --------------------------- |
-  | NameNode    | 9000         | 9000                | Communication RPC avec HDFS |
-  | NameNode UI | 9870         | 9870                | Interface Web de gestion    |
-  | DataNode    | 9864         | (non exposé)        | Interface Web du DataNode   |
-
-
 ### 3. Peupler les bases de données
 
-Au lancement d'Oracle NoSQL, le conteneur va insérer 10 000 lignes dans la base.
-
-Attendre l'insertion des données dans Oracle NoSQ :
+Pour Oracle NoSQL :
 
 ```bash
-docker logs -f hotel_oraclenosql
+./init-data-oracle-nosql.sh  # Sur Windows, renommez le fichier en .bat
 ```
 
-> Cette commande affiche les logs en temps réel.  
-> Attendez que le message FINISHED apparaisse pour confirmer la fin de l'import.
+> Cela va créer les schémas dans Oracle NoSQL et insérer 10 000 lignes
 
 ### 4. Hive
 
@@ -107,6 +97,44 @@ Rendez-vous sur l'interface Jupyter : [http://localhost:8888/](http://localhost:
 - **Exemple de schéma** : Voir `oracle_nosql_schema.sql` (lignes 1 à 66).
 
 ### 4. **HDFS**
+  # Lien sur navigateur pour voir l'etat du namenode et datanode
+  - http://localhost:9870/
+  
+  # Copier le fichier JSON local dans le conteneur du NameNode HDFS
+  ```bash
+  docker cp ./HDFS/weather_data_2023.json hotel_hadoop_namenode:/weather_data_2023.json
+  ```
+
+  # Verification des erreurs entre le datanode et le namenode
+  ```bash
+    docker logs hotel_hadoop_datanode
+    docker logs hotel_hadoop_namenode
+  ```
+
+  # Entrer dans le conteneur du NameNode
+  ```bash
+  docker exec -it hotel_hadoop_namenode bash
+  ```
+
+  # Créer un répertoire dans HDFS
+  ```bash
+  hadoop fs -mkdir -p /user/root
+  ```
+
+  # Déplacer le fichier dans HDFS
+  ```bash
+  hadoop fs -put /weather_data_2023.json /user/root/weather_data_2023.json
+  ```
+
+  # Vérifier que le fichier est bien présent
+  ```bash
+  hdfs dfs -ls /user/root
+  ```
+
+  # Afficher le contenu du fichier
+  ```bash
+  hdfs dfs -cat /user/root/weather_data_2023.json
+  ```
 
 - **Données stockées** :
   - Données météorologiques (date, localisation, température, précipitations, conditions météo)
@@ -117,7 +145,7 @@ Rendez-vous sur l'interface Jupyter : [http://localhost:8888/](http://localhost:
   - Les données sont stockées sous forme de fichiers JSON et CSV dans HDFS.
   - Les fichiers sont accessibles via des outils comme Apache Spark ou Hive pour des analyses croisées.
 - **Exemple de données** :
-  - `HDFS/weather_data_2023.csv` (lignes 1 à 37)
+  - `HDFS/weather_data_2023.json` (lignes 1 à 37)
   - `HDFS/hotel_search_logs.csv` (lignes 1 à 20)
   - `HDFS/activity_search_logs.csv` (lignes 1 à 20)
   - `HDFS/search_logs_2023.csv` (lignes 1 à 10)
@@ -152,143 +180,6 @@ Le projet inclut un ensemble de questions d'analyse pour explorer les données s
    ```bash
    docker compose ps
    ```
-
-4. **Copier le fichier local dans le conteneur NameNode** :
-
-   ```bash
-    docker cp HDFS/weather_data.csv hotel_hadoop_namenode:/tmp/weather_data.csv
-    docker cp HDFS/hotel_search_logs.csv hotel_hadoop_namenode:/tmp/hotel_search_logs.csv
-    docker cp HDFS/activity_search_logs.csv hotel_hadoop_namenode:/tmp/activity_search_logs.csv
-    docker cp HDFS/search_logs_2023.csv hotel_hadoop_namenode:/tmp/search_logs_2023.csv
-
-   ```
-   
-5. **Verification des donnees dans HDFS** 
-
-   Connectez-vous au conteneur Hadoop et vérifiez les fichiers :
- ```bash
-    docker exec -it hotel_hadoop_namenode bash
-
-   ```
-   ```bash
-    cat /tmp/activity_search_logs.csv
-    cat /tmp/weather_data.csv
-    cat /tmp/hotel_search_logs.csv
-    cat /tmp/search_logs_2023.csv
-   ```
-   
-6. ** Connecte-toi dans le conteneur NameNode ** :
-
-   ```bash
-   docker exec -it hotel_hadoop_namenode bash
-   ```
-
-   Ensuite, connectez-vous à HDFS :
-
-   ```bash
-   hdfs dfs -ls /tmp
-   ```
-7. **Copier les fichiers dans HDFS** :
-
-   ```bash
-    docker exec -it hotel_hadoop_namenode bash
-    ```
-
-
-8. **Vérification des fichiers dans HDFS** :
-
-   ```bash
-    hdfs dfs -ls /tmp/weather_data_2023
-    hdfs dfs -ls /tmp/hotel_search_logs
-    hdfs dfs -ls /tmp/activity_search_logs
-    hdfs dfs -ls /tmp/search_logs_2023
-
-
-
-6. **Sortir du namenode** :
-    ```bash
-      exit;
-   ```
-7. **Copie des csv dans hdfs
-    ```bash
-      docker exec -it hotel_hadoop_namenode bash
-    ```
-    **Weather data**
-    ```bash
-        hdfs dfs -mkdir -p /hotel/weather_data
-        hdfs dfs -rm -f /hotel/weather_data/weather_data.csv
-        hdfs dfs -put /tmp/weather_data.csv /hotel/weather_data/
-      ```
-    **Hotel search logs**
-    ```bash
-        hdfs dfs -mkdir -p /hotel/hotel_search_logs
-        hdfs dfs -rm -f /hotel/hotel_search_logs/hotel_search_logs.csv
-        hdfs dfs -put /tmp/hotel_search_logs.csv /hotel/hotel_search_logs/
-      ```
-      **Activity Search logs**
-      ```bash
-        hdfs dfs -mkdir -p /hotel/activity_search_logs
-        hdfs dfs -rm -f /hotel/activity_search_logs/activity_search_logs.csv
-        hdfs dfs -put /tmp/activity_search_logs.csv /hotel/activity_search_logs/
-      ```
-      **Search Logs 2023**
-      ```bash
-        hdfs dfs -mkdir -p /hotel/search_logs_2023
-        hdfs dfs -rm -f /hotel/search_logs_2023/search_logs_2023.csv
-        hdfs dfs -put /tmp/search_logs_2023.csv /hotel/search_logs_2023/
-      ```
-
-8. ** Lancer un pipeline ELT avec Meltano
-
-  **Installation des plugins Meltano**
-
-    Dans le conteneur Meltano, exécute :
-
-    ```bash
-    docker exec -it hotel_meltano bash
-    cd /project
-    meltano install
-    ```
-
-
-  **Exécution d'un pipeline ELT**
-
-    Pour lancer un pipeline ELT (exemple pour le job `elt-historique-reservations`) :
-
-    ```bash
-    meltano run elt-historique-reservations
-
-9. **Creation des table externes dans hive pour toutes les fichiers** :
-
-   ```bash
-   docker exec -it hotel_hiveserver2 /bin/bash
-   beeline -u jdbc:hive2://localhost:10000
-   ```
-
-
-#
-
-
-# 
-
-
-# 
-
-
-10. ** Connection à hive** :
-
-   ```bash
-    docker exec -it hotel_hiveserver2 /bin/bash
-    hdfs dfs -ls /tmp/ 
-    beeline -u jdbc:hive2://localhost:10000
-   ```
-
-
-
-
-
-
-
 
 ### Arrêt du Projet
 
