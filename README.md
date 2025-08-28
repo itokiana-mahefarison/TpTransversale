@@ -79,10 +79,19 @@ Rendez-vous sur l'interface Jupyter : [http://localhost:8888/](http://localhost:
   - Réservations (dates, nombre de personnes, statut, montant total)
   - Paiements (méthode, montant, statut)
   - Activités touristiques (nom, description, prix, durée)
+  - Hôtels (nom, adresse, vile, pays, etc)
+- **Initialisation automatique**
+  -Lors du premier lancement du conteneur tptransversale_postgres, le fichier docker/postgres/init.sql est automatiquement exécuté.
+  -Il permet de générer :
+    -2000 clients
+    -2000 réservations 
+    -2000 paiements 
+    -500 activités
+    -50 hôtels
+  -L’exécution du script init.sql est assurée par le mécanisme natif de PostgreSQL dans Docker : tous les fichiers .sql dans /docker-entrypoint-initdb.d/ sont exécutés au démarrage si le volume est vide.
 - **Intégration** :
-  - Les données sont insérées via des requêtes SQL standard.
   - Les relations entre les tables (clients, réservations, hôtels) sont gérées via des clés étrangères.
-- **Exemple de schéma** : Voir `postgresql_schema.sql` (lignes 1 à 107).
+- **Exemple de schéma** : Voir `docker/postgres/init.sql`.
 
 ### 2. **Cassandra**
 
